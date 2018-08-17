@@ -10,7 +10,8 @@ PATH = '/DCIM/100__TSB'
 # Functions
 # -----------------------------------------------
 
-def list_images(url, path):
+def get_image_list(url, path):
+	# Returns a list of all the files currently on the SD card
 	r = requests.get(
 			'{}/command.cgi'.format(url), 
 			params={
@@ -28,21 +29,46 @@ def list_images(url, path):
 	return images
 
 def download_image(url, to):
+	# Downloads an image from the SD card to the specified output path
 	r = requests.get(url, stream=True)
 	if r.status_code == 200:
 		with open(to, 'wb') as f:
 			for chunk in r:
 				f.write(chunk)
 
+def is_alive(url):
+	# Check if the SD card server is still alive
+	r = requests.get(url)
+	if r.status_code == 200:
+		return True
+	else:
+		return False
+
 def main():
-	images = list_images(URL, PATH)
-	latest_image = images[len(images)-1]
-	image_url = URL + PATH + '/' + latest_image
-	to = 'output/' + latest_image
+	images = []
+	prev_len = len(images)
 
-	print(image_url)
+	if is_alive(URL):
+		print('CONNECTED')
+	else:
+		print('COULD NOT CONNECT')
 
-	download_image(image_url, to)
+	while is_alive(URL):
+		images = get_image_list(URL, PATH)
+		new_len = len(images)
+
+		if new_len > prev_len:
+			prev_len = new_len
+
+			latest_image = images[-1]
+			latest_image_url = URL + PATH + '/' + latest_image
+
+			output_path = 'output/' + latest_image
+			download_image(latest_image_url, output_path)
+
+			print('DOWNLOADED: ', latest_image)
+	print('DISCONNECTED')
+
 
 # Main
 # -----------------------------------------------
