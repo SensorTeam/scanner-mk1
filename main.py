@@ -39,9 +39,6 @@ def download(url, to):
 # System Functions
 # ------------------------------
 
-def test():
-	print('PASS')
-
 def is_connected():
 	# Checks if the SD card server is still alive
 	res = req.get(config.URL_SERVER)
