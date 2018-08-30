@@ -1,26 +1,26 @@
-import shutil
-import requests
+from .. import config
 
-# Constants
-# -----------------------------------------------
+import requests as req
 
-URL = 'http://flashair'
-PATH = '/DCIM/100__TSB'
+# Variables
+# ------------------------------
+
+prev_len = 0
 
 # Functions
-# -----------------------------------------------
+# ------------------------------
 
-def get_image_list(url, path):
+def get_images():
 	# Returns a list of all the files currently on the SD card
-	r = requests.get(
-			'{}/command.cgi'.format(url), 
-			params={
-				'op': 100,
-				'DIR': path
-			}
-		)
-	lines = r.text.split('\n')
+	res = req.get(
+		'{}/command.cgi'.format(config.URL_SERVER),
+		params={
+			'op': 100,
+			'DIR': '/' + config.PATH_SERVER
+		}
+	)
 	images = []
+	lines = res.text.split('\n')
 	for line in lines[1:]:
 		values = line.split(',')
 		if len(values) > 2:
@@ -28,50 +28,42 @@ def get_image_list(url, path):
 			images.append(image)
 	return images
 
-def download_image(url, to):
-	# Downloads an image from the SD card to the specified output path
-	r = requests.get(url, stream=True)
-	if r.status_code == 200:
-		with open(to, 'wb') as f:
-			for chunk in r:
-				f.write(chunk)
+def download(url, to):
+	# Downloads a file from the specified `url`
+	res = req.get(url, stream=True)
+	if res.status_code == 200:
+		with open(to, 'wb') as file:
+			for chunk in res:
+				file.write(chunk)
 
-def is_alive(url):
-	# Check if the SD card server is still alive
-	r = requests.get(url)
-	if r.status_code == 200:
+# System Functions
+# ------------------------------
+
+def test():
+	print('PASS')
+
+def is_connected():
+	# Checks if the SD card server is still alive
+	res = req.get(config.URL_SERVER)
+	if res.status_code == 200:
+		return True
+	else
+		return False
+
+def has_new_image():
+	# Checks if a new image has been added to the SD card
+	images = get_images()
+	new_len = len(images)
+	if new_len > prev_len:
+		prev_len = new_len
 		return True
 	else:
 		return False
 
-def main():
-	images = []
-	prev_len = len(images)
-
-	if is_alive(URL):
-		print('CONNECTED')
-	else:
-		print('COULD NOT CONNECT')
-
-	while is_alive(URL):
-		images = get_image_list(URL, PATH)
-		new_len = len(images)
-
-		if new_len > prev_len:
-			prev_len = new_len
-
-			latest_image = images[-1]
-			latest_image_url = URL + PATH + '/' + latest_image
-
-			output_path = 'output/' + latest_image
-			download_image(latest_image_url, output_path)
-
-			print('DOWNLOADED: ', latest_image)
-	print('DISCONNECTED')
-
-
-# Main
-# -----------------------------------------------
-
-if __name__ == '__main__':
-	main()
+def download_latest_image():
+	# Downloads two files (raw and jpg) from the SD card
+	images = get_images()
+	raw, jpg = images[-1], images[-2]
+	url = config.URL_SERVER + '/' + config.PATH_SERVER + '/'
+	download(url + raw, config.PATH_DOWNLOADS)
+	download(url + jpg, config.PATH_DOWNLOADS)
