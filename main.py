@@ -5,7 +5,7 @@ import requests as req
 # Functions
 # ------------------------------
 
-def get_images():
+def get_image_list():
 	# Returns a list of all the files currently on the SD card
 	res = req.get(
 		'{}/command.cgi'.format(config.URL_SERVER),
