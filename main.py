@@ -49,4 +49,4 @@ def download_latest_image():
 	url = config.URL_SERVER + '/' + config.PATH_SERVER + '/'
 	download(url + raw, config.PATH_DOWNLOADS + '/' + raw)
 	download(url + jpg, config.PATH_DOWNLOADS + '/' + jpg)
-	return raw[:-4]
+	return config.PATH_DOWNLOADS + '/'+ raw[:-4]
