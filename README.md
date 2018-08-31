@@ -1,4 +1,4 @@
-# Streamer
+# Scanner
 
 Streams and downloads the latest image from a Toshiba FlashAir SD card.
 
@@ -17,4 +17,4 @@ Streams and downloads the latest image from a Toshiba FlashAir SD card.
 
 ## Usage
 
-Run `main.py`!
+Use within The System!
