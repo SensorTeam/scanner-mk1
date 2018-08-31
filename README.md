@@ -1,4 +1,4 @@
-# Streamer
+# Scanner
 
 Streams and downloads the latest image from a Toshiba FlashAir SD card.
 
@@ -17,4 +17,8 @@ Streams and downloads the latest image from a Toshiba FlashAir SD card.
 
 ## Usage
 
-Run `main.py`!
+The following functions can be used by The System:
+
+* `is_connected()` — which checks if the SD card server is still alive
+* `get_image_list()` — which returns a list of all the files currently on the SD card
+* `download_latest_image()` — which downloads the latest image (as two files: `.CR2` and `.JPG`)
