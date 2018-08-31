@@ -1,4 +1,7 @@
-from . import config
+import sys
+sys.path.append('../')
+
+import config
 
 import requests as req
 
@@ -41,8 +44,8 @@ def is_connected():
 
 def download_latest_image():
 	# Downloads two files (raw and jpg) from the SD card
-	images = get_images()
-	raw, jpg = images[-1], images[-2]
+	image_list = get_image_list()
+	raw, jpg = image_list[-1], image_list[-2]
 	url = config.URL_SERVER + '/' + config.PATH_SERVER + '/'
 	download(url + raw, config.PATH_DOWNLOADS + '/' + raw)
 	download(url + jpg, config.PATH_DOWNLOADS + '/' + jpg)
